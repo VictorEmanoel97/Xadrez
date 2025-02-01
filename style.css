@@ -1,0 +1,76 @@
+body{
+  height:100vh;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  background-color: #312e2b;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.tabuleiro{
+  height:80vw;
+  width:80vw;
+  margin:0 auto;
+  flex-wrap:wrap;
+  display:flex;
+  border:solid rgb(0, 0, 0) 2px;
+}
+
+.quadrado{
+ width:12.5%;
+  height:12.5%;  
+  float: left;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.branco{
+  background-color: #EBECD0;
+}
+.preto{
+  background-color: #739552;
+}
+
+@media (min-width: 600px){
+  .tabuleiro{
+    height:600px;
+    width:600px;
+  }
+}
+
+.coordenadas{
+  height:auto;
+  display: flex;
+  left:4%;
+  bottom: 4%;
+  position: absolute;
+  font-size: 12px;
+  font-weight: bold;
+  
+}
+
+.texto{
+  color: #000000;
+}
+
+.num{
+  top: 4%;
+  right: 4%;
+  left: auto;
+  
+  color: #000000;
+}
+
+.peça{
+  width: 100%;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.peça img{
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
