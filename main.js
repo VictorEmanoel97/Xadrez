@@ -8,7 +8,7 @@ const pecas = document.querySelectorAll(".peça");
 // Seleciona todas as imagens dentro das peças
 const pecasImagens = document.querySelectorAll("img");
 
-// Configura o tabuleiro e as peças ao carregar o script
+// Configura o tabuleiro e as peças
 setupTabuleiro();
 setupPecas();
 
@@ -74,7 +74,7 @@ function drop(e) {
   }
 }
 
-// Função para obter movimentos válidos
+// Função movimentos válidos
 function getPossiveisMov(posicao, peca) {
   quadradosLegais = [];
   const tipoPeca = peca.classList[1];
@@ -142,24 +142,63 @@ function movimentosPeao(coluna, linha, peca) {
 }
 
 function movimentosTorre(coluna, linha) {
-  for (let i = 1; i <= 8; i++) {
-    if (i !== linha) quadradosLegais.push(coluna + i);
-  }
-  for (let i = 97; i <= 104; i++) {
-    let novaColuna = String.fromCharCode(i);
-    if (novaColuna !== coluna) quadradosLegais.push(novaColuna + linha);
+  const direcoes = [
+    [0, 1], [0, -1], [1, 0], [-1, 0] // Cima, Baixo, Direita, Esquerda
+  ];
+  
+  for (let [dx, dy] of direcoes) {
+    let novaColuna = coluna.charCodeAt(0);
+    let novaLinha = linha;
+    
+    while (true) {
+      novaColuna += dx;
+      novaLinha += dy;
+      let pos = String.fromCharCode(novaColuna) + novaLinha;
+      
+      if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
+      
+      let quadrado = document.getElementById(pos);
+      if (quadrado) {
+        let pecaNoDestino = quadrado.querySelector(".peça");
+        if (pecaNoDestino) {
+          if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
+            quadradosLegais.push(pos); // Captura possível
+          }
+          break; // Para ao encontrar qualquer peça
+        }
+        quadradosLegais.push(pos);
+      }
+    }
   }
 }
 
 function movimentosBispo(coluna, linha) {
-  for (let i = 1; i <= 8; i++) {
-    if (i !== linha) {
-      let deslocamento = i - linha;
-      let novaColuna1 = String.fromCharCode(coluna.charCodeAt(0) + deslocamento);
-      let novaColuna2 = String.fromCharCode(coluna.charCodeAt(0) - deslocamento);
-
-      if (novaColuna1 >= 'a' && novaColuna1 <= 'h') quadradosLegais.push(novaColuna1 + i);
-      if (novaColuna2 >= 'a' && novaColuna2 <= 'h') quadradosLegais.push(novaColuna2 + i);
+  const direcoes = [
+    [1, 1], [1, -1], [-1, 1], [-1, -1] // Diagonais superior direita, inferior direita, superior esquerda, inferior esquerda
+  ];
+  
+  for (let [dx, dy] of direcoes) {
+    let novaColuna = coluna.charCodeAt(0);
+    let novaLinha = linha;
+    
+    while (true) {
+      novaColuna += dx;
+      novaLinha += dy;
+      let pos = String.fromCharCode(novaColuna) + novaLinha;
+      
+      if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
+      
+      let quadrado = document.getElementById(pos);
+      if (quadrado) {
+        let pecaNoDestino = quadrado.querySelector(".peça");
+        if (pecaNoDestino) {
+          if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
+            quadradosLegais.push(pos); // Captura possível
+          }
+          break; // Para ao encontrar qualquer peça
+        }
+        quadradosLegais.push(pos);
+      }
     }
   }
 }

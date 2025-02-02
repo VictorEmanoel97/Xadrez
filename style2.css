@@ -1,0 +1,25 @@
+body {
+  display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+ background-color: darkgrey;
+margin: 0;
+}
+
+  
+.botao-play {
+  
+padding: 55px 110px;
+font-size: 60px;
+color: white;
+background-color: #28a745;
+border: none;
+border-radius: 20px;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+.botao-play:hover {
+background-color: #218838;
+  
+}
