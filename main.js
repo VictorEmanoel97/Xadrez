@@ -1,80 +1,87 @@
-// Quadrados válidos para movimento
 let quadradosLegais = [];
-// Variável de turno
 let turnobranco = true;
-const tabuleiro = document.querySelectorAll(".quadrado");
-// Seleciona todas as peças com classe peça
-const pecas = document.querySelectorAll(".peça");
-// Seleciona todas as imagens dentro das peças
-const pecasImagens = document.querySelectorAll("img");
+let pecaSelecionada = null;
 
-// Configura o tabuleiro e as peças
+const tabuleiro = document.querySelectorAll(".quadrado");
+const pecas = document.querySelectorAll(".peça");
+
 setupTabuleiro();
 setupPecas();
 
-// Função para configurar tabuleiro
+// Configurar tabuleiro
 function setupTabuleiro() {
   let i = 0;
   for (let quadrado of tabuleiro) {
-    quadrado.addEventListener("dragover", (e) => {
-      e.preventDefault(); 
-    });
-    quadrado.addEventListener("drop", drop);
-    
     let row = 8 - Math.floor(i / 8);
     let column = String.fromCharCode(97 + (i % 8));
-    quadrado.id = column + row; // Define o ID do quadrado
+    quadrado.id = column + row;
+    quadrado.addEventListener("click", moverPeca); // clique
     i++;
   }
 }
 
-// Configurar peças
+// Configura peças
 function setupPecas() {
   for (let peca of pecas) {
-    peca.addEventListener("dragstart", drag);
-    if (peca) {
-      peca.setAttribute("draggable", true);
-      peca.id = peca.classList[1] + peca.parentElement.id;
+    peca.addEventListener("click", selecionarPeca);
+    peca.id = peca.classList[1] + peca.parentElement.id;
+  }
+}
+
+function selecionarPeca(e) {
+  const peca = e.currentTarget;
+  const pecaCor = peca.getAttribute("color");
+
+  if ((turnobranco && pecaCor === "branco") || (!turnobranco && pecaCor === "preto")) {
+    if (pecaSelecionada === peca) {
+      pecaSelecionada = null;
+      limparDestaques();
+    } else {
+      pecaSelecionada = peca;
+      getPossiveisMov(peca.parentNode.id, peca);
+      destacarQuadrados(); // Adiciona destaque
     }
   }
-
-  for (let pecaImagem of pecasImagens) {
-    pecaImagem.setAttribute("draggable", false);
-  }
 }
 
-// Função chamada ao arrastar uma peça
-function drag(e) {
-  const peca = e.target;
-  const pecaCor = peca.getAttribute("color") || ""; 
-  if ((turnobranco && pecaCor === "branco") || (!turnobranco && pecaCor === "preto")) {
-    e.dataTransfer.setData("text", peca.id);
-    const quadradoInicialId = peca.parentNode.id;
-    getPossiveisMov(quadradoInicialId, peca);
-  }
-}
+function moverPeca(e) {
+  if (!pecaSelecionada) return;
 
-// Função chamada ao dropar uma peça
-function drop(e) {
-  e.preventDefault();
-  let data = e.dataTransfer.getData("text");
-  const peca = document.getElementById(data);
   const destinoQuadrado = e.currentTarget;
   const pecaNoDestino = destinoQuadrado.querySelector(".peça");
-  
+
   if (quadradosLegais.includes(destinoQuadrado.id)) {
     if (!pecaNoDestino) {
-      destinoQuadrado.appendChild(peca);
-      turnobranco = !turnobranco;
-    } else if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
+      destinoQuadrado.appendChild(pecaSelecionada);
+    } else if (pecaNoDestino.getAttribute("color") !== pecaSelecionada.getAttribute("color")) {
       pecaNoDestino.remove();
-      destinoQuadrado.appendChild(peca);
-      turnobranco = !turnobranco;
+      destinoQuadrado.appendChild(pecaSelecionada);
+    }
+    
+    turnobranco = !turnobranco;
+    pecaSelecionada = null;
+    limparDestaques(); // remove apos mover
+  }
+}
+
+// destacar quadrados legais
+function destacarQuadrados() {
+  limparDestaques(); // exclui marcações 
+  for (let id of quadradosLegais) {
+    let quadrado = document.getElementById(id);
+    if (quadrado) {
+      quadrado.classList.add("destaque");
     }
   }
 }
 
-// Função movimentos válidos
+// limpa destaque quando é movida ou deselecionada
+function limparDestaques() {
+  for (let quadrado of tabuleiro) {
+    quadrado.classList.remove("destaque"); 
+  }
+}
+// Função para obter movimentos válidos
 function getPossiveisMov(posicao, peca) {
   quadradosLegais = [];
   const tipoPeca = peca.classList[1];
@@ -86,16 +93,16 @@ function getPossiveisMov(posicao, peca) {
       movimentosPeao(coluna, linha, peca);
       break;
     case tipoPeca.includes("torre"):
-      movimentosTorre(coluna, linha);
+      movimentosTorre(coluna, linha, peca);
       break;
     case tipoPeca.includes("bispo"):
-      movimentosBispo(coluna, linha);
+      movimentosBispo(coluna, linha, peca);
       break;
     case tipoPeca.includes("cavalo"):
       movimentosCavalo(coluna, linha);
       break;
     case tipoPeca.includes("rainha"):
-      movimentosRainha(coluna, linha);
+      movimentosRainha(coluna, linha, peca);
       break;
     case tipoPeca.includes("rei"):
       movimentosRei(coluna, linha);
@@ -103,18 +110,18 @@ function getPossiveisMov(posicao, peca) {
   }
 }
 
-// Funções para movimentação das peças
+// movimento das peças 
 function movimentosPeao(coluna, linha, peca) {
   const direcao = peca.getAttribute("color") === "branco" ? 1 : -1;
   const novaLinha = linha + direcao;
   const linhaInicial = peca.getAttribute("color") === "branco" ? 2 : 7;
   
-  // Verifica se a casa à frente está livre
+  // ve se a casa da frente ta livre
   let quadradoFrente = document.getElementById(coluna + novaLinha);
   if (quadradoFrente && !quadradoFrente.querySelector(".peça")) {
     quadradosLegais.push(coluna + novaLinha);
 
-    // Se o peão estiver na posição inicial, pode avançar duas casas
+    // se o peão estiver na posição inicial pode avançar duas vezes
     const duasCasas = linha + 2 * direcao;
     let quadradoDuasCasas = document.getElementById(coluna + duasCasas);
     if (linha === linhaInicial && quadradoDuasCasas && !quadradoDuasCasas.querySelector(".peça")) {
@@ -122,7 +129,7 @@ function movimentosPeao(coluna, linha, peca) {
     }
   }
 
-  // Capturas diagonais
+  // diagonal captura
   const colunasLaterais = [
     String.fromCharCode(coluna.charCodeAt(0) - 1),
     String.fromCharCode(coluna.charCodeAt(0) + 1)
@@ -141,7 +148,7 @@ function movimentosPeao(coluna, linha, peca) {
   }
 }
 
-function movimentosTorre(coluna, linha) {
+function movimentosTorre(coluna, linha, peca) {
   const direcoes = [
     [0, 1], [0, -1], [1, 0], [-1, 0] // Cima, Baixo, Direita, Esquerda
   ];
@@ -153,28 +160,30 @@ function movimentosTorre(coluna, linha) {
     while (true) {
       novaColuna += dx;
       novaLinha += dy;
-      let pos = String.fromCharCode(novaColuna) + novaLinha;
       
       if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
       
+      let pos = String.fromCharCode(novaColuna) + novaLinha;
       let quadrado = document.getElementById(pos);
-      if (quadrado) {
-        let pecaNoDestino = quadrado.querySelector(".peça");
-        if (pecaNoDestino) {
-          if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
-            quadradosLegais.push(pos); // Captura possível
-          }
-          break; // Para ao encontrar qualquer peça
+      if (!quadrado) break;
+
+      let pecaNoDestino = quadrado.querySelector(".peça");
+
+      if (pecaNoDestino) {
+        if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
+          quadradosLegais.push(pos);
         }
-        quadradosLegais.push(pos);
+        break;
       }
+
+      quadradosLegais.push(pos);
     }
   }
 }
 
-function movimentosBispo(coluna, linha) {
+function movimentosBispo(coluna, linha, peca) {
   const direcoes = [
-    [1, 1], [1, -1], [-1, 1], [-1, -1] // Diagonais superior direita, inferior direita, superior esquerda, inferior esquerda
+    [1, 1], [1, -1], [-1, 1], [-1, -1] // Diagonal
   ];
   
   for (let [dx, dy] of direcoes) {
@@ -184,25 +193,26 @@ function movimentosBispo(coluna, linha) {
     while (true) {
       novaColuna += dx;
       novaLinha += dy;
-      let pos = String.fromCharCode(novaColuna) + novaLinha;
       
       if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
       
+      let pos = String.fromCharCode(novaColuna) + novaLinha;
       let quadrado = document.getElementById(pos);
-      if (quadrado) {
-        let pecaNoDestino = quadrado.querySelector(".peça");
-        if (pecaNoDestino) {
-          if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
-            quadradosLegais.push(pos); // Captura possível
-          }
-          break; // Para ao encontrar qualquer peça
+      if (!quadrado) break;
+
+      let pecaNoDestino = quadrado.querySelector(".peça");
+
+      if (pecaNoDestino) {
+        if (pecaNoDestino.getAttribute("color") !== peca.getAttribute("color")) {
+          quadradosLegais.push(pos);
         }
-        quadradosLegais.push(pos);
+        break; 
       }
+
+      quadradosLegais.push(pos);
     }
   }
 }
-
 function movimentosCavalo(coluna, linha) {
   const movimentos = [
     [2, 1], [2, -1], [-2, 1], [-2, -1],
@@ -217,9 +227,9 @@ function movimentosCavalo(coluna, linha) {
   }
 }
 
-function movimentosRainha(coluna, linha) {
-  movimentosTorre(coluna, linha);
-  movimentosBispo(coluna, linha);
+function movimentosRainha(coluna, linha, peca) {
+  movimentosTorre(coluna, linha, peca);
+  movimentosBispo(coluna, linha,peca);
 }
 
 function movimentosRei(coluna, linha) {
@@ -236,3 +246,32 @@ function movimentosRei(coluna, linha) {
   }
 }
 
+function atualizarCoordenadas(peca, posicao) {
+  const coordenadasDiv = document.getElementById("coordenadasDiv");
+  const nomePeca = peca.classList[1]; // pega o nome da peça
+  const cor = peca.getAttribute("color"); // pega a cor da peça
+
+  coordenadasDiv.textContent = `${nomePeca} (${cor}) - ${posicao}`; 
+}
+// Chama quando houver um movimento
+function moverPeca(e) {
+  if (!pecaSelecionada) return;
+
+  const destinoQuadrado = e.currentTarget;
+  const pecaNoDestino = destinoQuadrado.querySelector(".peça");
+
+  if (quadradosLegais.includes(destinoQuadrado.id)) {
+    if (!pecaNoDestino) {
+      destinoQuadrado.appendChild(pecaSelecionada);
+    } else if (pecaNoDestino.getAttribute("color") !== pecaSelecionada.getAttribute("color")) {
+      pecaNoDestino.remove();
+      destinoQuadrado.appendChild(pecaSelecionada);
+    }
+
+    turnobranco = !turnobranco;
+    atualizarCoordenadas(pecaSelecionada, destinoQuadrado.id); 
+    //nome, cor e posição
+    pecaSelecionada = null;
+    limparDestaques();
+  }
+}

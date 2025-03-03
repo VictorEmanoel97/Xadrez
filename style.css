@@ -33,10 +33,10 @@ body{
   background-color: #739552;
 }
 
-@media (min-width: 600px){
+@media (min-width: 400px){
   .tabuleiro{
-    height:600px;
-    width:600px;
+    height:400px;
+    width:400px;
   }
 }
 
@@ -73,4 +73,22 @@ body{
   max-width: 100%;
   width: 100%;
   height: auto;
+}
+
+.destaque {
+  background-color: rgba(0, 255, 0, 0.5);
+  opacity:60%;
+  border-radius: 100%;
+}
+
+.coordenadas-container {
+  width: 200px;
+  height: auto;
+  background: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-family: Arial, sans-serif;
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
