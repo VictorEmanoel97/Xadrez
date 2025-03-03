@@ -1,3 +1,5 @@
+let posicaoReiBranco = "e1";
+let posicaoReiPreto = "e8";
 let quadradosLegais = [];
 let turnobranco = true;
 let pecaSelecionada = null;
@@ -57,7 +59,7 @@ function moverPeca(e) {
       pecaNoDestino.remove();
       destinoQuadrado.appendChild(pecaSelecionada);
     }
-    
+
     turnobranco = !turnobranco;
     pecaSelecionada = null;
     limparDestaques(); // remove apos mover
@@ -115,7 +117,7 @@ function movimentosPeao(coluna, linha, peca) {
   const direcao = peca.getAttribute("color") === "branco" ? 1 : -1;
   const novaLinha = linha + direcao;
   const linhaInicial = peca.getAttribute("color") === "branco" ? 2 : 7;
-  
+
   // ve se a casa da frente ta livre
   let quadradoFrente = document.getElementById(coluna + novaLinha);
   if (quadradoFrente && !quadradoFrente.querySelector(".peça")) {
@@ -134,7 +136,7 @@ function movimentosPeao(coluna, linha, peca) {
     String.fromCharCode(coluna.charCodeAt(0) - 1),
     String.fromCharCode(coluna.charCodeAt(0) + 1)
   ];
-  
+
   for (let novaColuna of colunasLaterais) {
     if (novaColuna >= 'a' && novaColuna <= 'h') {
       let quadradoDiagonal = document.getElementById(novaColuna + novaLinha);
@@ -152,17 +154,17 @@ function movimentosTorre(coluna, linha, peca) {
   const direcoes = [
     [0, 1], [0, -1], [1, 0], [-1, 0] // Cima, Baixo, Direita, Esquerda
   ];
-  
+
   for (let [dx, dy] of direcoes) {
     let novaColuna = coluna.charCodeAt(0);
     let novaLinha = linha;
-    
+
     while (true) {
       novaColuna += dx;
       novaLinha += dy;
-      
+
       if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
-      
+
       let pos = String.fromCharCode(novaColuna) + novaLinha;
       let quadrado = document.getElementById(pos);
       if (!quadrado) break;
@@ -185,17 +187,17 @@ function movimentosBispo(coluna, linha, peca) {
   const direcoes = [
     [1, 1], [1, -1], [-1, 1], [-1, -1] // Diagonal
   ];
-  
+
   for (let [dx, dy] of direcoes) {
     let novaColuna = coluna.charCodeAt(0);
     let novaLinha = linha;
-    
+
     while (true) {
       novaColuna += dx;
       novaLinha += dy;
-      
+
       if (novaColuna < 97 || novaColuna > 104 || novaLinha < 1 || novaLinha > 8) break;
-      
+
       let pos = String.fromCharCode(novaColuna) + novaLinha;
       let quadrado = document.getElementById(pos);
       if (!quadrado) break;
@@ -275,3 +277,52 @@ function moverPeca(e) {
     limparDestaques();
   }
 }
+
+function atualizarPosicaoRei(peca, novaPosicao) {
+  const cor = peca.getAttribute("color");
+  if (peca.classList.contains("rei")) {
+    if (cor === "branco") {
+      posicaoReiBranco = novaPosicao;
+    } else if (cor === "preto") {
+      posicaoReiPreto = novaPosicao;
+    }
+  }
+}
+
+function atualizarPosicaoRei(peca, novaPosicao) {
+  const cor = peca.getAttribute("color");
+  if (peca.classList.contains("rei")) {
+    if (cor === "branco") {
+      posicaoReiBranco = novaPosicao;
+    } else if (cor === "preto") {
+      posicaoReiPreto = novaPosicao;
+    }
+  }
+}
+
+//move a porra da peça
+
+function moverPeca(e) {
+  if (!pecaSelecionada) return;
+
+  const destinoQuadrado = e.currentTarget;
+  const pecaNoDestino = destinoQuadrado.querySelector(".peça");
+
+  if (quadradosLegais.includes(destinoQuadrado.id)) {
+    if (!pecaNoDestino) {
+      destinoQuadrado.appendChild(pecaSelecionada);
+    } else if (pecaNoDestino.getAttribute("color") !== pecaSelecionada.getAttribute("color")) {
+      pecaNoDestino.remove();
+      destinoQuadrado.appendChild(pecaSelecionada);
+    }
+
+    turnobranco = !turnobranco;
+    atualizarCoordenadas(pecaSelecionada, destinoQuadrado.id);
+    atualizarPosicaoRei(pecaSelecionada, destinoQuadrado.id); // Atualiza a posição do rei
+    pecaSelecionada = null;
+    limparDestaques();
+  }
+}
+
+console.log("Posição do Rei Branco:", posicaoReiBranco);
+console.log("Posição do Rei Preto:", posicaoReiPreto);
