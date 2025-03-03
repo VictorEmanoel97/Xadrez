@@ -255,39 +255,6 @@ function atualizarCoordenadas(peca, posicao) {
 
   coordenadasDiv.textContent = `${nomePeca} (${cor}) - ${posicao}`; 
 }
-// Chama quando houver um movimento
-function moverPeca(e) {
-  if (!pecaSelecionada) return;
-
-  const destinoQuadrado = e.currentTarget;
-  const pecaNoDestino = destinoQuadrado.querySelector(".peça");
-
-  if (quadradosLegais.includes(destinoQuadrado.id)) {
-    if (!pecaNoDestino) {
-      destinoQuadrado.appendChild(pecaSelecionada);
-    } else if (pecaNoDestino.getAttribute("color") !== pecaSelecionada.getAttribute("color")) {
-      pecaNoDestino.remove();
-      destinoQuadrado.appendChild(pecaSelecionada);
-    }
-
-    turnobranco = !turnobranco;
-    atualizarCoordenadas(pecaSelecionada, destinoQuadrado.id); 
-    //nome, cor e posição
-    pecaSelecionada = null;
-    limparDestaques();
-  }
-}
-
-function atualizarPosicaoRei(peca, novaPosicao) {
-  const cor = peca.getAttribute("color");
-  if (peca.classList.contains("rei")) {
-    if (cor === "branco") {
-      posicaoReiBranco = novaPosicao;
-    } else if (cor === "preto") {
-      posicaoReiPreto = novaPosicao;
-    }
-  }
-}
 
 function atualizarPosicaoRei(peca, novaPosicao) {
   const cor = peca.getAttribute("color");
