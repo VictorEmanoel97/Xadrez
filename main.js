@@ -293,3 +293,47 @@ function moverPeca(e) {
 
 console.log("Posição do Rei Branco:", posicaoReiBranco);
 console.log("Posição do Rei Preto:", posicaoReiPreto);
+
+function atualizarHistorico(peca, origem, destino) {
+  const historicoDiv = document.getElementById("historicoMovimentos");
+  
+  const movimento = document.createElement("div");
+  movimento.classList.add("movimento");
+
+  const imgPeca = document.createElement("img");
+  imgPeca.src = peca.src; // Captura a imagem da peça
+  imgPeca.alt = peca.classList[1]; // Nome da peça
+  imgPeca.classList.add("miniPeca"); // Define um estilo menor
+
+  const textoMovimento = document.createElement("span");
+  textoMovimento.textContent = `${origem} → ${destino}`;
+
+  movimento.appendChild(imgPeca);
+  movimento.appendChild(textoMovimento);
+
+  historicoDiv.appendChild(movimento);
+}
+
+// Modifique moverPeca para incluir o histórico
+function moverPeca(e) {
+  if (!pecaSelecionada) return;
+
+  const destinoQuadrado = e.currentTarget;
+  const origemQuadrado = pecaSelecionada.parentNode.id;
+  const pecaNoDestino = destinoQuadrado.querySelector(".peça");
+
+  if (quadradosLegais.includes(destinoQuadrado.id)) {
+    if (!pecaNoDestino) {
+      destinoQuadrado.appendChild(pecaSelecionada);
+    } else if (pecaNoDestino.getAttribute("color") !== pecaSelecionada.getAttribute("color")) {
+      pecaNoDestino.remove();
+      destinoQuadrado.appendChild(pecaSelecionada);
+    }
+
+    atualizarHistorico(pecaSelecionada, origemQuadrado, destinoQuadrado.id);
+    turnobranco = !turnobranco;
+    atualizarPosicaoRei(pecaSelecionada, destinoQuadrado.id);
+    pecaSelecionada = null;
+    limparDestaques();
+  }
+}
