@@ -29,7 +29,13 @@ body {
   margin: 0;
 }
 
-.botao-play {
+#pgnInput{
+  position:relative;
+  margin: top;
+  height: 100px;
+}
+
+#analyzeBtn {
   margin-top: 50%;
   font-size: 40px;
   width:300px;

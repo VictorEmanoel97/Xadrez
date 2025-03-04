@@ -90,24 +90,3 @@ body{
   top: 20px;
   right: 0px;
 }
-
-#historicoMovimentos {
-  max-height: 200px;
-  overflow-y: auto;
-  border: 1px solid black;
-  padding: 10px;
-  width: 200px;
-  background-color: #f8f8f8;
-}
-
-.movimento {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 5px;
-}
-
-.miniPeca {
-  width: 20px;
-  height: 20px;
-}
