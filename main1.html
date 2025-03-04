@@ -4,16 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style2.css" type="text/css" media="all" />
+      <script src="main.js"></script>
+      <script src="path/to/stockfish-17.js"></script>
     <title>Tela com Botão de Play</title>
 </head>
 <body>
   <header><h1>xadrez</h1></header>
   <main>
     <div class="caixa"></div>
-      <a href="main.html"><button class="botao-play">Jogar</button>
+    <input type="text" id="pgnInput" placeholder="Digite o movimento em PGN">
+<button onclick="processarMovimento()">Executar Movimento</button>
       </a>
     </div>
   </main>
+
 </body>
 
 </html>
